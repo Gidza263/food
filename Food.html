@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research: Improving nutrition knowledge and behaviour through virtual reality-based nutrition education.</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #2980b9;
+            --secondary: #27ae60;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --border: #bdc3c7;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-top: 0;
+            font-size: 1.5rem;
+            line-height: 1.4;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: var(--secondary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Form Steps */
+        .step {
+            display: none;
+            animation: fadeIn 0.4s;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-group {
+            margin-bottom: 25px;
+        }
+
+        .question-group label, .question-title {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .sub-question {
+            margin-left: 15px;
+            margin-top: 15px;
+        }
+
+        /* Inputs */
+        textarea, input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        
+        textarea {
+            min-height: 80px;
+        }
+
+        textarea:focus, input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.2);
+        }
+
+        /* Complex Layouts */
+        .term-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        @media (min-width: 600px) {
+            .term-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .term-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        /* Matrix Table */
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            overflow-x: auto;
+            display: block;
+        }
+        
+        @media (min-width: 600px) {
+            .matrix-table { display: table; }
+        }
+
+        .matrix-table th, .matrix-table td {
+            border: 1px solid var(--border);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .matrix-table th {
+            background-color: #ecf0f1;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-prev { background-color: #95a5a6; color: white; }
+        .btn-next, .btn-submit { background-color: var(--primary); color: white; }
+        .btn-submit { background-color: var(--secondary); }
+        button:hover { opacity: 0.9; }
+
+        /* Summary Screen */
+        #summary-screen { display: none; text-align: center; }
+        .success-icon { font-size: 4rem; color: var(--secondary); margin-bottom: 20px; }
+        #loading-msg { display: none; color: var(--primary); font-weight: bold; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <h1>Research: Improving nutrition knowledge and behaviour through virtual reality-based nutrition education.</h1>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <form id="survey-form">
+            
+            <div class="step active" data-step="1">
+                <h2>Participant Information</h2>
+                <div class="question-group">
+                    <label>What is your name and surname?</label>
+                    <input type="text" name="participant_name" placeholder="Type your full name here...">
+                </div>
+                <div class="question-group">
+                    <label>Please provide me with your contact details, Email address, and/or telephone number.</label>
+                    <input type="text" name="contact_details" placeholder="Email address or phone number...">
+                </div>
+            </div>
+
+            <div class="step" data-step="2">
+                <h2>General Health Concepts</h2>
+                <div class="question-group">
+                    <label>1. What do you understand by the term balanced diet?</label>
+                    <textarea name="q1" placeholder="Type your answer here..."></textarea>
+                </div>
+                <div class="question-group">
+                    <label>2. What are the things that are associated with being healthy?</label>
+                    <textarea name="q2" placeholder="Diet, exercise, sleep, etc..."></textarea>
+                </div>
+            </div>
+
+            <div class="step" data-step="3">
+                <h2>Food Terminology</h2>
+                <p class="question-title">3. What do the following terms mean to you, and can you please give a food example of each?</p>
+                <div class="term-grid">
+                    <div class="term-item"><label>3.1 Healthy food</label><input type="text" name="q3_1_meaning" placeholder="Meaning..."><input type="text" name="q3_1_example" placeholder="Example..." style="margin-top: 5px;"></div>
+                    <div class="term-item"><label>3.2 Unhealthy food</label><input type="text" name="q3_2_meaning" placeholder="Meaning..."><input type="text" name="q3_2_example" placeholder="Example..." style="margin-top: 5px;"></div>
+                    <div class="term-item"><label>3.3 Energy-dense food</label><input type="text" name="q3_3_meaning" placeholder="Meaning..."><input type="text" name="q3_3_example" placeholder="Example..." style="margin-top: 5px;"></div>
+                    <div class="term-item"><label>3.4 Nutrient-dense food</label><input type="text" name="q3_4_meaning" placeholder="Meaning..."><input type="text" name="q3_4_example" placeholder="Example..." style="margin-top: 5px;"></div>
+                    <div class="term-item"><label>3.5 Empty calorie food</label><input type="text" name="q3_5_meaning" placeholder="Meaning..."><input type="text" name="q3_5_example" placeholder="Example..." style="margin-top: 5px;"></div>
+                    <div class="term-item"><label>3.6 Fast food</label><input type="text" name="q3_6_meaning" placeholder="Meaning..."><input type="text" name="q3_6_example" placeholder="Example..." style="margin-top: 5px;"></div>
+                    <div class="term-item"><label>3.7 Processed food</label><input type="text" name="q3_7_meaning" placeholder="Meaning..."><input type="text" name="q3_7_example" placeholder="Example..." style="margin-top: 5px;"></div>
+                    <div class="term-item"><label>3.8 Organic food</label><input type="text" name="q3_8_meaning" placeholder="Meaning..."><input type="text" name="q3_8_example" placeholder="Example..." style="margin-top: 5px;"></div>
+                </div>
+            </div>
+
+            <div class="step" data-step="4">
+                <h2>Food Groups</h2>
+                <div class="question-group">
+                    <label>4. What is your understanding of the term “food group”?</label>
+                    <textarea name="q4" placeholder="Your understanding..."></textarea>
+                </div>
+                <div class="question-group sub-question">
+                    <label>4.1 What food groups do you know about? Please name and give an example of a food in each group.</label>
+                    <textarea name="q4_1" placeholder="e.g., Dairy (Milk), Proteins (Chicken)..."></textarea>
+                </div>
+                <div class="question-group sub-question">
+                    <label>4.2 Identify which food group each of the following foods or drinks belongs to:</label>
+                    <table class="matrix-table" id="table-step4">
+                        <tr><th>Food Item</th><th>Food Group</th></tr>
+                        </table>
+                </div>
+            </div>
+
+            <div class="step" data-step="5">
+                <h2>Food Pyramid & Consumption</h2>
+                <div class="question-group">
+                    <label>5. What is your understanding of the food pyramid?</label>
+                    <textarea name="q5" placeholder="Your understanding..."></textarea>
+                </div>
+                <div class="question-group sub-question">
+                    <label>5.1 Do you use the food pyramid to guide your daily eating?</label>
+                    <select name="q5_1">
+                        <option value="">-- Select an option --</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                        <option value="Sometimes">Sometimes</option>
+                    </select>
+                </div>
+                <div class="question-group">
+                    <label>6. How often do you eat the following foods and drinks?</label>
+                    <table class="matrix-table" id="table-step5">
+                        <tr>
+                            <th>Food Item</th>
+                            <th>Never</th><th>Rarely</th><th>Sometimes</th><th>Often</th><th>Daily</th>
+                        </tr>
+                        </table>
+                </div>
+            </div>
+
+            <div class="step" data-step="6">
+                <h2>Personal Choices & Habits</h2>
+                <div class="question-group">
+                    <label>7. What foods do you choose to eat?</label>
+                    <textarea name="q7" placeholder="Describe your general food preferences..."></textarea>
+                </div>
+                <div class="question-group">
+                    <label>8. Describe your daily eating habits. Include snacking.</label>
+                    <textarea name="q8" placeholder="e.g., 3 meals a day, late night snacking..."></textarea>
+                </div>
+                <div class="question-group">
+                    <label>9. How do you control the portion sizes of each food item when eating?</label>
+                    <textarea name="q9" placeholder="e.g., using smaller plates, measuring cups, visual estimation..."></textarea>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button type="button" id="prevBtn" class="btn-prev" onclick="changeStep(-1)">Previous</button>
+                <div>
+                    <button type="button" id="nextBtn" class="btn-next" onclick="changeStep(1)">Next</button>
+                    <div id="loading-msg">Generating PDF, please wait...</div>
+                </div>
+            </div>
+        </form>
+
+        <div id="summary-screen">
+            <div class="success-icon">✓</div>
+            <h2>Survey Completed!</h2>
+            <p>Thank you for taking the time to participate in this research.</p>
+            <p><strong>Your answers have been downloaded as a PDF file.</strong></p>
+            <button onclick="location.reload()" style="margin-top: 20px; background-color: var(--primary); color: white; padding: 12px 24px; border:none; border-radius: 6px; cursor: pointer;">Start Over</button>
+        </div>
+    </div>
+
+    <script>
+        // --- OFFLINE IMAGE GENERATOR ---
+        // This creates embedded SVG images so you don't need external files or internet
+        const createOfflineImg = (emoji, color) => {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><rect width="60" height="60" fill="${color}" rx="8"/><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-size="30">${emoji}</text></svg>`;
+            return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        };
+
+        const foodItems = [
+            { id: 1, name: "Fizzy drink/ soft drink", img: createOfflineImg('🥤', '#e74c3c') },
+            { id: 2, name: "Spinach", img: createOfflineImg('🥬', '#2ecc71') },
+            { id: 3, name: "Fat cakes", img: createOfflineImg('🥐', '#f39c12') },
+            { id: 4, name: "Plain yoghurt", img: createOfflineImg('🥣', '#bdc3c7') },
+            { id: 5, name: "Kota", img: createOfflineImg('🥪', '#e67e22') },
+            { id: 6, name: "Beans", img: createOfflineImg('🫘', '#8e44ad') },
+            { id: 7, name: "Salted Snoek fish", img: createOfflineImg('🐟', '#3498db') },
+            { id: 8, name: "Chicken breast", img: createOfflineImg('🍗', '#f1c40f') },
+            { id: 9, name: "Avocado", img: createOfflineImg('🥑', '#16a085') },
+            { id: 10, name: "Mageu", img: createOfflineImg('🥛', '#95a5a6') },
+            { id: 11, name: "Potato fried chips", img: createOfflineImg('🍟', '#d35400') }
+        ];
+
+        // --- POPULATE TABLES ---
+        const table4 = document.getElementById('table-step4');
+        const table5 = document.getElementById('table-step5');
+
+        foodItems.forEach((item, index) => {
+            // Populate Step 4 (Food Groups)
+            table4.innerHTML += `
+                <tr>
+                    <td style="display: flex; align-items: center; gap: 15px; text-align: left; font-weight: bold;">
+                        <img src="${item.img}" alt="${item.name}" style="width: 50px; height: 50px; border-radius: 8px;">
+                        4.2.${item.id} ${item.name}
+                    </td>
+                    <td style="vertical-align: middle;">
+                        <input type="text" name="q4_2_${item.id}" placeholder="Food group...">
+                    </td>
+                </tr>
+            `;
+
+            // Populate Step 5 (Frequency)
+            table5.innerHTML += `
+                <tr>
+                    <td style="display: flex; align-items: center; gap: 10px; text-align: left; font-weight: bold;">
+                        <img src="${item.img}" alt="${item.name}" style="width: 40px; height: 40px; border-radius: 6px;">
+                        6.${item.id} ${item.name}
+                    </td>
+                    <td style="vertical-align: middle;"><input type="radio" name="freq_${item.id}" value="Never"></td>
+                    <td style="vertical-align: middle;"><input type="radio" name="freq_${item.id}" value="Rarely"></td>
+                    <td style="vertical-align: middle;"><input type="radio" name="freq_${item.id}" value="Sometimes"></td>
+                    <td style="vertical-align: middle;"><input type="radio" name="freq_${item.id}" value="Often"></td>
+                    <td style="vertical-align: middle;"><input type="radio" name="freq_${item.id}" value="Daily"></td>
+                </tr>
+            `;
+        });
+
+        // --- NAVIGATION & LOGIC ---
+        let currentStep = 0;
+        const steps = document.querySelectorAll(".step");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const progressBar = document.getElementById("progress-bar");
+        const form = document.getElementById("survey-form");
+        const summaryScreen = document.getElementById("summary-screen");
+        const loadingMsg = document.getElementById("loading-msg");
+
+        function showStep(n) {
+            steps.forEach(step => step.classList.remove("active"));
+            steps[n].classList.add("active");
+            
+            const progress = ((n + 1) / steps.length) * 100;
+            progressBar.style.width = progress + "%";
+
+            prevBtn.style.display = (n === 0) ? "none" : "inline-block";
+            
+            if (n === (steps.length - 1)) {
+                nextBtn.innerHTML = "Submit & Download PDF";
+                nextBtn.classList.remove("btn-next");
+                nextBtn.classList.add("btn-submit");
+            } else {
+                nextBtn.innerHTML = "Next";
+                nextBtn.classList.remove("btn-submit");
+                nextBtn.classList.add("btn-next");
+            }
+        }
+
+        function changeStep(n) {
+            if (n === 1 && currentStep === steps.length - 1) {
+                generatePDF();
+                return;
+            }
+            currentStep = currentStep + n;
+            showStep(currentStep);
+            document.getElementById('app-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generatePDF() {
+            nextBtn.style.display = "none";
+            prevBtn.style.display = "none";
+            loadingMsg.style.display = "block";
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            const pdfContainer = document.createElement('div');
+            pdfContainer.style.padding = '30px';
+            pdfContainer.style.fontFamily = 'Helvetica, Arial, sans-serif';
+            pdfContainer.style.color = '#333';
+            pdfContainer.style.fontSize = '14px';
+            pdfContainer.style.lineHeight = '1.6';
+
+            const getAns = (key) => {
+                const val = data[key];
+                return (val && val.trim() !== "") ? val : "<em>Not answered</em>";
+            };
+
+            let htmlString = `
+                <h2 style="color: #2980b9; text-align: center; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; font-size: 18px;">Research: Improving nutrition knowledge and behaviour through virtual reality-based nutrition education.</h2>
+                
+                <div style="background: #f8f9fa; padding: 15px; border-left: 4px solid #27ae60; margin-bottom: 20px;">
+                    <p style="margin: 0 0 5px 0;"><strong>Name & Surname:</strong> ${getAns('participant_name')}</p>
+                    <p style="margin: 0;"><strong>Contact Details:</strong> ${getAns('contact_details')}</p>
+                </div>
+
+                <h3 style="color: #27ae60;">General Health Concepts</h3>
+                <p><strong>1. Balanced diet meaning:</strong><br/>${getAns('q1')}</p>
+                <p><strong>2. Things associated with being healthy:</strong><br/>${getAns('q2')}</p>
+
+                <h3 style="color: #27ae60;">Food Terminology</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <tr style="background: #ecf0f1;">
+                        <th style="border: 1px solid #bdc3c7; padding: 8px; text-align: left;">Term</th>
+                        <th style="border: 1px solid #bdc3c7; padding: 8px; text-align: left;">Meaning</th>
+                        <th style="border: 1px solid #bdc3c7; padding: 8px; text-align: left;">Example</th>
+                    </tr>
+            `;
+
+            const terms = ['Healthy food', 'Unhealthy food', 'Energy-dense food', 'Nutrient-dense food', 'Empty calorie food', 'Fast food', 'Processed food', 'Organic food'];
+            terms.forEach((term, i) => {
+                htmlString += `
+                    <tr>
+                        <td style="border: 1px solid #bdc3c7; padding: 8px;"><strong>3.${i+1} ${term}</strong></td>
+                        <td style="border: 1px solid #bdc3c7; padding: 8px;">${getAns(`q3_${i+1}_meaning`)}</td>
+                        <td style="border: 1px solid #bdc3c7; padding: 8px;">${getAns(`q3_${i+1}_example`)}</td>
+                    </tr>
+                `;
+            });
+            htmlString += `</table>`;
+
+            htmlString += `
+                <div class="html2pdf__page-break"></div>
+                <h3 style="color: #27ae60;">Food Groups & Frequencies</h3>
+                <p><strong>4. Food group meaning:</strong><br/>${getAns('q4')}</p>
+                <p><strong>4.1 Known groups & examples:</strong><br/>${getAns('q4_1')}</p>
+                
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                    <tr style="background: #ecf0f1;">
+                        <th style="border: 1px solid #bdc3c7; padding: 8px; text-align: left;">Food Item</th>
+                        <th style="border: 1px solid #bdc3c7; padding: 8px; text-align: left;">Identified Group</th>
+                        <th style="border: 1px solid #bdc3c7; padding: 8px; text-align: left;">Eating Frequency</th>
+                    </tr>
+            `;
+
+            foodItems.forEach((item) => {
+                htmlString += `
+                    <tr>
+                        <td style="border: 1px solid #bdc3c7; padding: 8px;">${item.name}</td>
+                        <td style="border: 1px solid #bdc3c7; padding: 8px;">${getAns(`q4_2_${item.id}`)}</td>
+                        <td style="border: 1px solid #bdc3c7; padding: 8px;">${getAns(`freq_${item.id}`)}</td>
+                    </tr>
+                `;
+            });
+            
+            htmlString += `
+                </table>
+                <h3 style="color: #27ae60;">Personal Choices & Habits</h3>
+                <p><strong>5. Food pyramid understanding:</strong><br/>${getAns('q5')}</p>
+                <p><strong>5.1 Use food pyramid?</strong> ${getAns('q5_1')}</p>
+                <p><strong>7. Foods chosen to eat:</strong><br/>${getAns('q7')}</p>
+                <p><strong>8. Daily habits & snacking:</strong><br/>${getAns('q8')}</p>
+                <p><strong>9. Portion control:</strong><br/>${getAns('q9')}</p>
+            `;
+
+            pdfContainer.innerHTML = htmlString;
+
+            let safeName = getAns('participant_name').replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'participant';
+            const opt = {
+                margin:       0.5,
+                filename:     `Research_Survey_${safeName}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(pdfContainer).save().then(() => {
+                form.style.display = "none";
+                document.querySelector(".progress-container").style.display = "none";
+                summaryScreen.style.display = "block";
+                loadingMsg.style.display = "none";
+                document.getElementById('app-container').scrollIntoView({ behavior: 'smooth' });
+            }).catch(err => {
+                alert("An error occurred while generating the PDF. Please try again.");
+                nextBtn.style.display = "inline-block";
+                loadingMsg.style.display = "none";
+            });
+        }
+
+        // Initialize
+        showStep(currentStep);
+    </script>
+</body>
+</html>
